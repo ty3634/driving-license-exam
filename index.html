@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>운전면허 학과시험 모의고사</title>
+<style>
+  :root{
+    --bg1:#eef4ff; --bg2:#f5f0ff; --bg3:#fff5f0;
+    --card:#ffffff; --text:#293049; --muted:#7c8499;
+    --primary:#5b7cfa; --primary2:#8b6cf0; --primary-dark:#4a63d6;
+    --danger:#ef6a5f; --danger-bg:#fdeeec; --success:#3cb87a; --success-bg:#e9f9f0;
+    --border:#e7eaf5; --radius:20px; --radius-sm:13px;
+    --shadow:0 10px 30px -12px rgba(70,80,140,.16), 0 2px 8px rgba(70,80,140,.06);
+    --shadow-sm:0 4px 14px -6px rgba(70,80,140,.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;color:var(--text);min-height:100vh;
+    background:
+      radial-gradient(1100px 500px at -10% -10%, rgba(139,108,240,.10), transparent 55%),
+      radial-gradient(900px 500px at 110% 0%, rgba(255,190,150,.14), transparent 55%),
+      linear-gradient(180deg, var(--bg1), var(--bg2) 45%, var(--bg3));
+    background-attachment:fixed;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Noto Sans SC",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:720px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+  header.topbar{padding:26px 20px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .brand-badge{width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:var(--shadow-sm);}
+  header.topbar h1{font-size:15.5px;margin:0;color:var(--muted);font-weight:600;letter-spacing:.01em;line-height:1.4;}
+  main{flex:1;padding:10px 18px 44px;display:flex;flex-direction:column;gap:16px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:26px 24px;box-shadow:var(--shadow);animation:riseIn .38s cubic-bezier(.22,.9,.35,1) both;}
+  @keyframes riseIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  .center{text-align:center;}
+  h2.title{font-size:21px;margin:4px 0 4px;font-weight:800;letter-spacing:-.01em;}
+  p.sub{color:var(--muted);font-size:14px;margin:0 0 20px;line-height:1.5;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid.single{grid-template-columns:1fr;}
+  button.choice{
+    display:block;width:100%;padding:17px 14px;font-size:15px;font-weight:700;
+    border:1.5px solid var(--border);border-radius:var(--radius-sm);background:#fbfcff;color:var(--text);
+    cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,background .15s ease;
+    text-align:center;line-height:1.4;
+  }
+  button.choice:hover{border-color:var(--primary);background:#f2f5ff;transform:translateY(-2px);box-shadow:var(--shadow-sm);}
+  button.choice:active{transform:translateY(0) scale(.98);}
+  button.choice small{display:block;color:var(--muted);font-weight:500;font-size:12px;margin-top:4px;}
+  .btn{
+    display:inline-block;padding:14px 22px;font-size:15px;font-weight:700;border:none;
+    border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--primary),var(--primary2));
+    color:#fff;cursor:pointer;box-shadow:0 6px 16px -6px rgba(91,124,250,.55);
+    transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+  }
+  .btn:hover{filter:brightness(1.06);transform:translateY(-1px);}
+  .btn:active{transform:translateY(0) scale(.98);}
+  .btn:disabled{background:#c3cae0;box-shadow:none;cursor:not-allowed;filter:none;transform:none;}
+  .btn.secondary{background:#eef1f8;color:var(--text);box-shadow:none;}
+  .btn.secondary:hover{background:#e5e9f4;}
+  .btn.block{display:block;width:100%;text-align:center;}
+  .rowbtns{display:flex;gap:10px;margin-top:18px;}
+  .rowbtns .btn{flex:1;}
+  .progress-wrap{display:flex;flex-direction:column;gap:8px;padding:6px 4px 4px;}
+  .progress-toprow{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);}
+  .progress-bar{height:6px;border-radius:6px;background:#e4e9f7;overflow:hidden;}
+  .progress-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--primary),var(--primary2));
+    transition:width .25s ease;}
+  .timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:14.5px;color:var(--primary-dark);
+    background:#eef1ff;padding:5px 12px;border-radius:20px;}
+  .timer.low{color:#b8382c;background:var(--danger-bg);}
+  .qnum{font-weight:800;color:var(--primary);}
+  .qtext{font-size:17px;line-height:1.6;margin:8px 0 18px;white-space:pre-wrap;}
+  .qimg{max-width:100%;border-radius:14px;border:1px solid var(--border);margin-bottom:16px;display:block;box-shadow:var(--shadow-sm);}
+  .opt{
+    display:flex;align-items:flex-start;gap:11px;padding:14px 15px;border:1.5px solid var(--border);
+    border-radius:var(--radius-sm);margin-bottom:9px;cursor:pointer;font-size:15px;line-height:1.5;background:#fff;
+    transition:border-color .15s ease,background .15s ease,transform .1s ease;
+  }
+  .opt:hover{border-color:#c3cef7;background:#f8faff;}
+  .opt.selected{border-color:var(--primary);background:#f0f3ff;box-shadow:0 0 0 3px rgba(91,124,250,.10);}
+  .opt input{margin-top:3px;flex-shrink:0;width:17px;height:17px;accent-color:var(--primary);cursor:pointer;}
+  .hint{font-size:12.5px;color:var(--primary-dark);margin:-8px 0 14px;background:#eef1ff;display:inline-block;
+    padding:6px 11px;border-radius:20px;font-weight:600;}
+  .navbar{display:flex;gap:10px;margin-top:10px;}
+  .navbar .btn{flex:1;}
+  .qgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:16px;}
+  .qgrid button{
+    aspect-ratio:1;border-radius:9px;border:1.5px solid var(--border);background:#fff;
+    font-size:12px;cursor:pointer;color:var(--muted);transition:.15s ease;font-weight:600;
+  }
+  .qgrid button:hover{border-color:var(--primary);}
+  .qgrid button.answered{background:#eef1ff;border-color:var(--primary);color:var(--primary-dark);font-weight:800;}
+  .qgrid button.current{outline:2px solid var(--primary);outline-offset:1px;}
+  .score-ring{width:150px;height:150px;margin:6px auto 4px;position:relative;display:flex;align-items:center;justify-content:center;}
+  .score-ring svg{transform:rotate(-90deg);}
+  .score-ring .ring-bg{fill:none;stroke:#eceffb;stroke-width:10;}
+  .score-ring .ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .7s cubic-bezier(.22,.9,.35,1);}
+  .score-ring .ring-fill.pass{stroke:url(#ringGradSuccess);}
+  .score-ring .ring-fill.fail{stroke:url(#ringGradDanger);}
+  .score-ring-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+  .result-score{font-size:34px;font-weight:800;margin:0;line-height:1;}
+  .result-score small{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
+  .result-pass{font-size:20px;font-weight:800;padding:6px 0 2px;border-radius:10px;margin-bottom:8px;letter-spacing:.02em;}
+  .result-pass.pass{color:var(--success);}
+  .result-pass.fail{color:var(--danger);}
+  .meta-row{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted);
+    padding:9px 2px;border-bottom:1px dashed var(--border);}
+  .meta-row span:last-child{color:var(--text);font-weight:600;}
+  .review-item{border-bottom:1px solid var(--border);padding:16px 0;}
+  .review-item:last-child{border-bottom:none;}
+  .review-item .qtext{font-size:14.5px;margin:4px 0 9px;}
+  .review-opt{font-size:13.5px;padding:8px 11px;border-radius:10px;margin-bottom:4px;}
+  .review-opt.correct{background:var(--success-bg);color:#177a48;font-weight:700;}
+  .review-opt.wrong-pick{background:var(--danger-bg);color:#c23f30;font-weight:700;}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;
+    background:#eef1f6;color:var(--muted);margin-left:6px;}
+  .tag.ok{background:var(--success-bg);color:#177a48;}
+  .tag.no{background:var(--danger-bg);color:#c23f30;}
+  .footer-admin{text-align:center;padding:22px;font-size:12px;color:#a7aec2;}
+  .footer-admin a{color:#a7aec2;text-decoration:underline;cursor:pointer;}
+  .admin-table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 18px;
+    border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+  .admin-table th,.admin-table td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:9px 8px;text-align:center;}
+  .admin-table th:last-child,.admin-table td:last-child{border-right:none;}
+  .admin-table tr:last-child td{border-bottom:none;}
+  .admin-table th{background:#f4f6fc;font-weight:700;}
+  input.pin{width:100%;padding:13px;font-size:16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    margin-bottom:14px;text-align:center;letter-spacing:.3em;background:#fbfcff;}
+  input.pin:focus{outline:none;border-color:var(--primary);}
+  .lang-note{font-size:12px;color:var(--muted);margin-top:2px;}
+  .disabled-choice{opacity:.42;cursor:not-allowed;}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand-badge">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="9" stroke="#ffffff" stroke-width="1.8"/>
+        <circle cx="12" cy="12" r="2.1" fill="#ffffff"/>
+        <path d="M12 3v4.3M12 16.7V21M3 12h4.3M16.7 12H21" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1 id="appTitle">운전면허 학과시험 모의고사 / Driver's License Written Exam</h1>
+  </header>
+  <main id="main"></main>
+</div>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="ringGradSuccess" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3cb87a"/><stop offset="100%" stop-color="#7fd9a8"/>
+    </linearGradient>
+    <linearGradient id="ringGradDanger" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ef6a5f"/><stop offset="100%" stop-color="#f6a89e"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- hidden iframe + form used to silently POST results to Google Forms without
+     navigating away or needing CORS (classic <form target=iframe> technique) -->
+<iframe name="stats_iframe" style="display:none" title="stats"></iframe>
+<form id="statsForm" method="POST" target="stats_iframe" style="display:none"
+      action="https://docs.google.com/forms/d/e/1FAIpQLSff8UcP_s53Rilz09Cj0T7LjVWg4sx5bHaXeGy27XeuRqEt_A/formResponse">
+  <input name="entry.1048852077" id="f_pass">
+  <input name="entry.1045418599" id="f_lang">
+  <input name="entry.1267629898" id="f_license">
+  <input name="entry.267684070" id="f_gender">
+  <input name="entry.1683057195" id="f_age">
+  <input name="entry.444821885" id="f_score">
+</form>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- static config ---------------- */
+
+  var LANGS = [
+    {code:"ko", label:"한국어", label_ko:"한국어", ready:true},
+    {code:"en", label:"English", label_ko:"영어", ready:true},
+    {code:"zh", label:"中文", label_ko:"중국어", ready:true},
+    {code:"vi", label:"Tiếng Việt", label_ko:"베트남어", ready:true}
+  ];
+
+  // license type -> { bank file key, pass threshold, per-language label }
+  // label_ko is always used for the stats sheet (실적 기록), independent of UI language.
+  var LICENSES = [
+    {id:"1_large",   label_ko:"1종 대형",                       label_en:"Class I license for large motor vehicles",              label_vi:"Bằng lái xe cỡ lớn hạng 1",                              label_zh:"1种大型",                          bank:"AB", pass:70},
+    {id:"1_special", label_ko:"1종 특수 (대형견인·구난차)",       label_en:"Class I special license (large trailer / wrecker)",     label_vi:"Bằng lái xe đặc biệt hạng 1 (xe kéo cỡ lớn/xe cứu hộ)",   label_zh:"1种特殊（大型牵引车·救援车）",        bank:"AB", pass:70},
+    {id:"1_normal",  label_ko:"1종 보통",                        label_en:"Class I license for ordinary motor vehicles",            label_vi:"Bằng lái xe phổ thông hạng 1",                           label_zh:"1种普通",                          bank:"AB", pass:70},
+    {id:"2_normal",  label_ko:"2종 보통",                        label_en:"Class II license for ordinary motor vehicles",           label_vi:"Bằng lái xe phổ thông hạng 2",                           label_zh:"2种普通",                          bank:"AB", pass:60},
+    {id:"2_small",   label_ko:"2종 소형 (125cc 초과 이륜자동차)", label_en:"Class II license for small motor vehicles (125cc+ motorcycle)", label_vi:"Bằng lái xe cỡ nhỏ hạng 2 (xe máy hai bánh trên 125cc)", label_zh:"2种小型（排气量超过125cc的两轮摩托车）", bank:"MC", pass:60},
+    {id:"2_moped",   label_ko:"2종 원동기장치자전거 (125cc 이하)", label_en:"Class II license for mopeds (125cc or under)",           label_vi:"Bằng lái xe đạp gắn động cơ hạng 2 (từ 125cc trở xuống)", label_zh:"2种原动机装置自行车（125cc以下）",   bank:"MC", pass:60}
+  ];
+
+  var GENDERS = [
+    {value:"남", ko:"남", en:"Male", vi:"Nam", zh:"男"},
+    {value:"여", ko:"여", en:"Female", vi:"Nữ", zh:"女"}
+  ];
+  var AGES = [
+    {value:"10대",     ko:"10대",     en:"10s",           vi:"Dưới 20 tuổi",        zh:"10多岁"},
+    {value:"20대",     ko:"20대",     en:"20s",           vi:"20 - 29 tuổi",        zh:"20多岁"},
+    {value:"30대",     ko:"30대",     en:"30s",           vi:"30 - 39 tuổi",        zh:"30多岁"},
+    {value:"40대",     ko:"40대",     en:"40s",           vi:"40 - 49 tuổi",        zh:"40多岁"},
+    {value:"50대",     ko:"50대",     en:"50s",           vi:"50 - 59 tuổi",        zh:"50多岁"},
+    {value:"60대 이상", ko:"60대 이상", en:"60s or above", vi:"Từ 60 tuổi trở lên",  zh:"60岁以上"}
+  ];
+
+  var EXAM_QUESTION_COUNT = 40;
+  var EXAM_SECONDS = 40 * 60;
+  var ADMIN_PIN = "0906"; // simple deterrent only, not real security
+
+  var BANK_FILES = {
+    AB: {ko: "data/bank_AB.ko.json", en: "data/bank_AB.en.json", vi: "data/bank_AB.vi.json", zh: "data/bank_AB.zh.json"},
+    MC: {ko: "data/bank_MC.ko.json", en: "data/bank_MC.en.json", vi: "data/bank_MC.vi.json", zh: "data/bank_MC.zh.json"}
+  };
+  var IMAGE_DIRS = {AB: "images/ab/", MC: "images/mc/"};
+
+  var SHEET_URL = "https://docs.google.com/spreadsheets/d/1n7UTedY_BAprUONYhaaMkyTyGO0lPfN_5x7AqkmLZ28/edit";
+
+  /* ---------------- i18n ---------------- */
+
+  var STR = {
+    ko: {
+      appTitle: "운전면허 학과시험 모의고사",
+      langTitle: "언어를 선택하세요",
+      langSub: "Select your language / 请选择语言 / Chọn ngôn ngữ",
+      comingSoon: "준비 중",
+      comingSoonAlert: function(label){ return "현재 "+label+" 문제는 준비 중입니다. 한국어·영어·중국어·베트남어로 먼저 이용해주세요."; },
+      licenseTitle: "응시할 면허 종류를 선택하세요",
+      licenseSub: "선택한 면허 종류의 합격 기준으로 채점됩니다",
+      passLabel: function(p){ return p+"점 이상 합격"; },
+      genderTitle: "성별을 선택하세요",
+      genderSub: "통계 목적으로만 사용되며 개인을 식별하지 않습니다",
+      ageTitle: "연령대를 선택하세요",
+      preparing: "문제를 준비하고 있습니다...",
+      loadFailTitle: "문제를 불러오지 못했습니다",
+      questionsUnit: "문항",
+      questionLabel: "문제",
+      selectAllHint: function(n){ return "※ 정답 "+n+"개를 모두 선택하세요"; },
+      prev: "이전", next: "다음", submit: "제출하기",
+      confirmUnanswered: function(n){ return n+"개 문항이 아직 답변되지 않았습니다. 그래도 제출하시겠습니까?"; },
+      resultTitle: "채점 결과",
+      scoreUnit: "점",
+      pass: "합격", fail: "불합격",
+      correctCountLabel: "맞은 문항",
+      licenseLabel: "응시 면허",
+      passStandardLabel: "합격 기준",
+      standardSuffix: "점 이상",
+      retry: "다시 응시하기",
+      reviewTitle: "문제별 정답 확인",
+      correctTag: "정답", wrongTag: "오답",
+      explanationPrefix: "해설: ",
+      adminLink: "관리자",
+      adminAuthTitle: "관리자 인증",
+      pinPlaceholder: "PIN 입력",
+      cancel: "취소", confirm: "확인",
+      pinWrong: "PIN이 올바르지 않습니다.",
+      adminTitle: "관리자 모드 — 실적 확인",
+      adminSub: "응시 기록(익명 집계)은 연동된 구글 스프레드시트에 자동으로 쌓입니다. 아래 버튼으로 직접 열어 응시 횟수·인원, 합격률, 언어/면허종류/성별/연령대별 통계를 확인하세요. (구글 계정 로그인 필요 — 소유자만 열람 가능)",
+      openSheet: "실적 기록 스프레드시트 열기",
+      standardsTitle: "면허 종류별 합격 기준",
+      thLicense: "면허 종류", thBank: "문제은행", thStandard: "합격 기준",
+      bankAB: "1·2종 공통", bankMC: "이륜자동차",
+      adminNote: "※ 실적 통계는 앱이 아닌 구글 스프레드시트에서 직접 확인하는 방식입니다 (앱은 익명 응시자 페이지이므로 통계를 페이지 내에서 집계·표시하지 않고, 응답은 구글 설문지를 통해 소유자 계정의 스프레드시트로만 전송됩니다).",
+      close: "닫기",
+      qImgAlt: "문제 이미지"
+    },
+    en: {
+      appTitle: "Driver's License Written Exam — Practice Test",
+      langTitle: "Select your language",
+      langSub: "언어를 선택하세요 / 请选择语言 / Chọn ngôn ngữ",
+      comingSoon: "Coming soon",
+      comingSoonAlert: function(label){ return "The "+label+" question set is not ready yet — Korean, English, Chinese, and Vietnamese are available now."; },
+      licenseTitle: "Select the license type you're testing for",
+      licenseSub: "You'll be graded against the pass threshold for the license you choose",
+      passLabel: function(p){ return "Pass at "+p+" or higher"; },
+      genderTitle: "Select your gender",
+      genderSub: "Used only for anonymous statistics — no personal data is identified",
+      ageTitle: "Select your age group",
+      preparing: "Preparing your questions...",
+      loadFailTitle: "Couldn't load the questions",
+      questionsUnit: "questions",
+      questionLabel: "Question",
+      selectAllHint: function(n){ return "※ Select all "+n+" correct answers"; },
+      prev: "Previous", next: "Next", submit: "Submit",
+      confirmUnanswered: function(n){ return n+" question(s) are still unanswered. Submit anyway?"; },
+      resultTitle: "Your Result",
+      scoreUnit: " points",
+      pass: "Pass", fail: "Fail",
+      correctCountLabel: "Correct answers",
+      licenseLabel: "License type",
+      passStandardLabel: "Pass threshold",
+      standardSuffix: " or higher",
+      retry: "Try again",
+      reviewTitle: "Answer Review",
+      correctTag: "Correct", wrongTag: "Incorrect",
+      explanationPrefix: "Explanation: ",
+      adminLink: "Admin",
+      adminAuthTitle: "Admin sign-in",
+      pinPlaceholder: "Enter PIN",
+      cancel: "Cancel", confirm: "OK",
+      pinWrong: "Incorrect PIN.",
+      adminTitle: "Admin mode — Usage statistics",
+      adminSub: "Anonymous session records are collected automatically in a linked Google Sheet. Open it below to see total sessions, pass rate, and breakdowns by language / license type / gender / age group. (Google sign-in required — only the owner can view it.)",
+      openSheet: "Open the statistics spreadsheet",
+      standardsTitle: "Pass threshold by license type",
+      thLicense: "License type", thBank: "Question bank", thStandard: "Pass threshold",
+      bankAB: "Class I/II common", bankMC: "Motorcycle",
+      adminNote: "※ Statistics are viewed directly in the Google Sheet, not inside the app — this page is the anonymous test-taker page, so it never aggregates or displays stats itself. Each result is sent only to the owner's spreadsheet via the Google Form.",
+      close: "Close",
+      qImgAlt: "Question image"
+    },
+    vi: {
+      appTitle: "Thi sát hạch lý thuyết lái xe — Bài thi thử",
+      langTitle: "Vui lòng chọn ngôn ngữ",
+      langSub: "언어를 선택하세요 / Select your language / 请选择语言",
+      comingSoon: "Sắp ra mắt",
+      comingSoonAlert: function(label){ return "Bộ câu hỏi tiếng "+label+" chưa sẵn sàng — hiện có thể dùng tiếng Hàn, tiếng Anh, tiếng Trung và tiếng Việt."; },
+      licenseTitle: "Chọn loại giấy phép lái xe bạn muốn thi",
+      licenseSub: "Bạn sẽ được chấm điểm theo tiêu chuẩn đậu của loại bằng lái đã chọn",
+      passLabel: function(p){ return "Đậu từ "+p+" điểm trở lên"; },
+      genderTitle: "Vui lòng chọn giới tính",
+      genderSub: "Chỉ dùng cho mục đích thống kê ẩn danh — không xác định thông tin cá nhân",
+      ageTitle: "Vui lòng chọn độ tuổi",
+      preparing: "Đang chuẩn bị câu hỏi...",
+      loadFailTitle: "Không tải được câu hỏi",
+      questionsUnit: "câu",
+      questionLabel: "Câu",
+      selectAllHint: function(n){ return "※ Vui lòng chọn đủ "+n+" đáp án đúng"; },
+      prev: "Câu trước", next: "Câu tiếp", submit: "Nộp bài",
+      confirmUnanswered: function(n){ return "Còn "+n+" câu chưa trả lời. Vẫn muốn nộp bài?"; },
+      resultTitle: "Kết quả",
+      scoreUnit: " điểm",
+      pass: "Đậu", fail: "Rớt",
+      correctCountLabel: "Số câu đúng",
+      licenseLabel: "Loại bằng lái",
+      passStandardLabel: "Tiêu chuẩn đậu",
+      standardSuffix: " điểm trở lên",
+      retry: "Thi lại",
+      reviewTitle: "Xem lại đáp án từng câu",
+      correctTag: "Đúng", wrongTag: "Sai",
+      explanationPrefix: "Giải thích: ",
+      adminLink: "Quản trị",
+      adminAuthTitle: "Xác thực quản trị viên",
+      pinPlaceholder: "Nhập mã PIN",
+      cancel: "Hủy", confirm: "Xác nhận",
+      pinWrong: "Mã PIN không đúng.",
+      adminTitle: "Chế độ quản trị — Xem thống kê",
+      adminSub: "Kết quả thi (thống kê ẩn danh) được tự động lưu vào Google Sheet liên kết. Nhấn nút bên dưới để mở trực tiếp và xem tổng số lượt thi, tỷ lệ đậu, và thống kê theo ngôn ngữ/loại bằng lái/giới tính/độ tuổi. (Cần đăng nhập Google — chỉ chủ sở hữu mới xem được.)",
+      openSheet: "Mở bảng thống kê",
+      standardsTitle: "Tiêu chuẩn đậu theo loại bằng lái",
+      thLicense: "Loại bằng lái", thBank: "Bộ câu hỏi", thStandard: "Tiêu chuẩn đậu",
+      bankAB: "Chung hạng 1/2", bankMC: "Xe hai bánh",
+      adminNote: "※ Số liệu thống kê được xem trực tiếp trên Google Sheet, không hiển thị trong ứng dụng — đây là trang dành cho thí sinh ẩn danh nên bản thân trang không tổng hợp hay hiển thị thống kê. Mỗi kết quả chỉ được gửi đến bảng tính của chủ sở hữu qua Google Form.",
+      close: "Đóng",
+      qImgAlt: "Hình ảnh câu hỏi"
+    },
+    zh: {
+      appTitle: "驾驶证学科考试模拟测试",
+      langTitle: "请选择语言",
+      langSub: "언어를 선택하세요 / Select your language / Chọn ngôn ngữ",
+      comingSoon: "准备中",
+      comingSoonAlert: function(label){ return "目前"+label+"题库尚在准备中 — 现已支持韩语、英语、中文和越南语。"; },
+      licenseTitle: "请选择您要报考的驾照种类",
+      licenseSub: "将按照您所选驾照种类的合格标准进行评分",
+      passLabel: function(p){ return p+"分以上合格"; },
+      genderTitle: "请选择性别",
+      genderSub: "仅用于统计目的，不会识别个人信息",
+      ageTitle: "请选择年龄段",
+      preparing: "正在准备题目...",
+      loadFailTitle: "题目加载失败",
+      questionsUnit: "题",
+      questionLabel: "题",
+      selectAllHint: function(n){ return "※ 请选出全部 "+n+" 个正确答案"; },
+      prev: "上一题", next: "下一题", submit: "提交",
+      confirmUnanswered: function(n){ return "还有 "+n+" 道题未作答，仍要提交吗？"; },
+      resultTitle: "评分结果",
+      scoreUnit: "分",
+      pass: "合格", fail: "不合格",
+      correctCountLabel: "答对题数",
+      licenseLabel: "报考驾照",
+      passStandardLabel: "合格标准",
+      standardSuffix: "分以上",
+      retry: "重新测试",
+      reviewTitle: "逐题查看答案",
+      correctTag: "正确", wrongTag: "错误",
+      explanationPrefix: "解析：",
+      adminLink: "管理员",
+      adminAuthTitle: "管理员认证",
+      pinPlaceholder: "请输入PIN码",
+      cancel: "取消", confirm: "确认",
+      pinWrong: "PIN码不正确。",
+      adminTitle: "管理员模式 — 查看统计数据",
+      adminSub: "应试记录（匿名统计）会自动汇总到关联的谷歌表格中。点击下方按钮直接打开，即可查看总应试人次、合格率，以及按语言/驾照种类/性别/年龄段的统计数据。（需要谷歌账号登录 — 仅所有者可查看）",
+      openSheet: "打开统计表格",
+      standardsTitle: "各驾照种类合格标准",
+      thLicense: "驾照种类", thBank: "题库", thStandard: "合格标准",
+      bankAB: "1·2种通用", bankMC: "两轮摩托车",
+      adminNote: "※ 统计数据请直接在谷歌表格中查看，应用内不显示 — 本页面是匿名应试者页面，不会在页面内汇总或显示统计数据，每次结果仅通过谷歌表单发送至所有者的表格。",
+      close: "关闭",
+      qImgAlt: "题目图片"
+    }
+  };
+  function t(){ return STR[state.lang] || STR.ko; }
+
+  /* ---------------- state ---------------- */
+
+  var state = {
+    lang: null,
+    license: null,
+    gender: null,
+    age: null,
+    questions: [],      // the 40 drawn questions (shuffled option order too)
+    answers: [],         // array of arrays (selected option indices, 1-based) per question
+    idx: 0,
+    timeLeft: EXAM_SECONDS,
+    timerHandle: null,
+    submitted: false
+  };
+
+  var bankCache = {}; // key: bank+lang -> array of questions
+
+  /* ---------------- utilities ---------------- */
+
+  function el(tag, cls, html){
+    var e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(html !== undefined) e.innerHTML = html;
+    return e;
+  }
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+  function fmtTime(sec){
+    var m = Math.floor(sec/60), s = sec%60;
+    return (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+  }
+  function licenseById(id){
+    for(var i=0;i<LICENSES.length;i++) if(LICENSES[i].id===id) return LICENSES[i];
+    return null;
+  }
+
+  function loadBank(bankKey, lang){
+    var cacheKey = bankKey+"_"+lang;
+    if(bankCache[cacheKey]) return Promise.resolve(bankCache[cacheKey]);
+    var path = (BANK_FILES[bankKey] && BANK_FILES[bankKey][lang]) || (BANK_FILES[bankKey] && BANK_FILES[bankKey]["ko"]);
+    return fetch(path).then(function(r){
+      if(!r.ok) throw new Error("bank fetch failed: "+path);
+      return r.json();
+    }).then(function(data){
+      bankCache[cacheKey] = data;
+      return data;
+    });
+  }
+
+  /* ---------------- rendering shell ---------------- */
+
+  var main = document.getElementById("main");
+  function render(node){
+    main.innerHTML = "";
+    main.appendChild(node);
+  }
+
+  /* ---------------- Screen: language ---------------- */
+
+  function screenLang(){
+    var wrap = el("div");
+    var card = el("div","card center");
+    card.appendChild(el("h2","title","언어를 선택하세요"));
+    card.appendChild(el("p","sub","Select your language / 请选择语言 / Chọn ngôn ngữ"));
+    var grid = el("div","grid");
+    LANGS.forEach(function(l){
+      var b = el("button","choice"+(l.ready?"":" disabled-choice"), l.label + (l.ready? "" : "<small>준비 중 (Coming soon)</small>"));
+      b.onclick = function(){
+        if(!l.ready){
+          alert("현재 " + l.label + " 문제는 준비 중입니다. 한국어로 먼저 이용해주세요.\n(" + l.label + " question set is not ready yet — Korean is available now.)");
+          return;
+        }
+        state.lang = l.code;
+        document.getElementById("appTitle").textContent = t().appTitle;
+        var adminLinkEl = document.getElementById("adminLink");
+        if(adminLinkEl) adminLinkEl.textContent = t().adminLink;
+        goLicense();
+      };
+      grid.appendChild(b);
+    });
+    card.appendChild(grid);
+    wrap.appendChild(card);
+    render(wrap);
+  }
+
+  /* ---------------- Screen: license ---------------- */
+
+  function licenseLabel(lic){
+    return lic["label_"+state.lang] || lic.label_ko;
+  }
+  function pickLang(obj){
+    return obj[state.lang] || obj.ko;
+  }
+
+  function screenLicense(){
+    var wrap = el("div");
+    var card = el("div","card center");
+    card.appendChild(el("h2","title",t().licenseTitle));
+    card.appendChild(el("p","sub",t().licenseSub));
+    var grid = el("div","grid single");
+    LICENSES.forEach(function(lic){
+      var b = el("button","choice", licenseLabel(lic) + "<small>"+t().passLabel(lic.pass)+"</small>");
+      b.onclick = function(){ state.license = lic.id; goGender(); };
+      grid.appendChild(b);
+    });
+    card.appendChild(grid);
+    wrap.appendChild(card);
+    render(wrap);
+  }
+
+  /* ---------------- Screen: gender ---------------- */
+
+  function screenGender(){
+    var wrap = el("div");
+    var card = el("div","card center");
+    card.appendChild(el("h2","title",t().genderTitle));
+    card.appendChild(el("p","sub",t().genderSub));
+    var grid = el("div","grid");
+    GENDERS.forEach(function(g){
+      var b = el("button","choice", pickLang(g));
+      b.onclick = function(){ state.gender = g; goAge(); };
+      grid.appendChild(b);
+    });
+    card.appendChild(grid);
+    wrap.appendChild(card);
+    render(wrap);
+  }
+
+  /* ---------------- Screen: age ---------------- */
+
+  function screenAge(){
+    var wrap = el("div");
+    var card = el("div","card center");
+    card.appendChild(el("h2","title",t().ageTitle));
+    var grid = el("div","grid");
+    AGES.forEach(function(a){
+      var b = el("button","choice", pickLang(a));
+      b.onclick = function(){ state.age = a; startExam(); };
+      grid.appendChild(b);
+    });
+    card.appendChild(grid);
+    wrap.appendChild(card);
+    render(wrap);
+  }
+
+  /* ---------------- Exam flow ---------------- */
+
+  function startExam(){
+    var lic = licenseById(state.license);
+    var card = el("div","card center");
+    card.appendChild(el("h2","title",t().preparing));
+    render(card);
+
+    loadBank(lic.bank, state.lang).then(function(bank){
+      var pool = shuffle(bank);
+      var picked = pool.slice(0, Math.min(EXAM_QUESTION_COUNT, pool.length));
+      // shuffle each question's option order, keep answer indices in sync
+      state.questions = picked.map(function(q){
+        var order = shuffle(q.options.map(function(_,i){return i;}));
+        var newOptions = order.map(function(i){return q.options[i];});
+        var newAnswer = q.answer.map(function(origIdx){
+          // origIdx is 1-based; find its new 1-based position
+          return order.indexOf(origIdx-1)+1;
+        });
+        return {
+          id:q.id, question:q.question, options:newOptions, answer:newAnswer,
+          explanation:q.explanation, has_image:q.has_image, images:q.images, bank: lic.bank
+        };
+      });
+      state.answers = state.questions.map(function(){return [];});
+      state.idx = 0;
+      state.timeLeft = EXAM_SECONDS;
+      state.submitted = false;
+      renderExamScreen();
+      startTimer();
+    }).catch(function(err){
+      var c = el("div","card center");
+      c.appendChild(el("h2","title",t().loadFailTitle));
+      c.appendChild(el("p","sub", String(err)));
+      render(c);
+    });
+  }
+
+  function startTimer(){
+    if(state.timerHandle) clearInterval(state.timerHandle);
+    state.timerHandle = setInterval(function(){
+      state.timeLeft--;
+      var t = document.getElementById("timerDisplay");
+      if(t){
+        t.textContent = fmtTime(Math.max(0,state.timeLeft));
+        t.className = "timer" + (state.timeLeft<=60 ? " low" : "");
+      }
+      if(state.timeLeft<=0){
+        clearInterval(state.timerHandle);
+        finishExam();
+      }
+    },1000);
+  }
+
+  function renderExamScreen(){
+    var q = state.questions[state.idx];
+    var wrap = el("div");
+
+    var progWrap = el("div","progress-wrap");
+    var topRow = el("div","progress-toprow");
+    topRow.appendChild(el("div","", "<span class='qnum'>"+(state.idx+1)+"</span> / "+state.questions.length+" "+t().questionsUnit));
+    topRow.appendChild(el("div","timer"+(state.timeLeft<=60?" low":""), fmtTime(state.timeLeft)));
+    topRow.querySelector(".timer") && (topRow.querySelector(".timer").id="timerDisplay");
+    progWrap.appendChild(topRow);
+    var pct = Math.round(((state.idx+1)/state.questions.length)*100);
+    var pbar = el("div","progress-bar");
+    var pfill = el("div","progress-bar-fill");
+    pfill.style.width = pct+"%";
+    pbar.appendChild(pfill);
+    progWrap.appendChild(pbar);
+    wrap.appendChild(progWrap);
+
+    var card = el("div","card");
+    card.appendChild(el("div","", "<span class='qnum'>"+t().questionLabel+" "+(state.idx+1)+"</span>"));
+    card.appendChild(el("div","qtext", escapeHtml(q.question)));
+
+    if(q.has_image && q.images && q.images.length){
+      q.images.forEach(function(fname){
+        var img = el("img","qimg");
+        img.src = IMAGE_DIRS[q.bank] + fname;
+        img.alt = t().qImgAlt;
+        card.appendChild(img);
+      });
+    }
+
+    var multi = q.answer.length > 1;
+    if(multi){
+      card.appendChild(el("div","hint", t().selectAllHint(q.answer.length)));
+    }
+
+    var selected = state.answers[state.idx];
+    q.options.forEach(function(optText, i){
+      var optIdx = i+1;
+      var row = el("label","opt"+(selected.indexOf(optIdx)>=0?" selected":""));
+      var input = document.createElement("input");
+      input.type = multi ? "checkbox" : "radio";
+      input.name = "opt";
+      input.checked = selected.indexOf(optIdx)>=0;
+      input.onchange = function(){
+        if(multi){
+          var pos = selected.indexOf(optIdx);
+          if(input.checked){ if(pos<0) selected.push(optIdx); }
+          else { if(pos>=0) selected.splice(pos,1); }
+        } else {
+          state.answers[state.idx] = [optIdx];
+        }
+        renderExamScreen();
+      };
+      row.appendChild(input);
+      var span = document.createElement("span");
+      span.textContent = (i+1)+". "+optText;
+      row.appendChild(span);
+      card.appendChild(row);
+    });
+
+    var nav = el("div","navbar");
+    var prevBtn = el("button","btn secondary",t().prev);
+    prevBtn.disabled = state.idx===0;
+    prevBtn.onclick = function(){ state.idx--; renderExamScreen(); };
+    nav.appendChild(prevBtn);
+
+    if(state.idx < state.questions.length-1){
+      var nextBtn = el("button","btn",t().next);
+      nextBtn.onclick = function(){ state.idx++; renderExamScreen(); };
+      nav.appendChild(nextBtn);
+    } else {
+      var submitBtn = el("button","btn",t().submit);
+      submitBtn.onclick = function(){
+        var unanswered = state.answers.filter(function(a){return a.length===0;}).length;
+        if(unanswered>0){
+          if(!confirm(t().confirmUnanswered(unanswered))) return;
+        }
+        finishExam();
+      };
+      nav.appendChild(submitBtn);
+    }
+    card.appendChild(nav);
+
+    // question jump grid
+    var qgrid = el("div","qgrid");
+    state.questions.forEach(function(_,i){
+      var b = document.createElement("button");
+      b.textContent = i+1;
+      b.className = (state.answers[i].length>0?"answered ":"") + (i===state.idx?"current":"");
+      b.onclick = function(){ state.idx=i; renderExamScreen(); };
+      qgrid.appendChild(b);
+    });
+    card.appendChild(qgrid);
+
+    wrap.appendChild(card);
+    render(wrap);
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function isCorrect(q, given){
+    if(given.length !== q.answer.length) return false;
+    var a = given.slice().sort();
+    var b = q.answer.slice().sort();
+    for(var i=0;i<a.length;i++) if(a[i]!==b[i]) return false;
+    return true;
+  }
+
+  function finishExam(){
+    if(state.submitted) return;
+    state.submitted = true;
+    if(state.timerHandle) clearInterval(state.timerHandle);
+
+    var correctCount = 0;
+    state.questions.forEach(function(q,i){
+      if(isCorrect(q, state.answers[i])) correctCount++;
+    });
+    var scorePercent = Math.round((correctCount/state.questions.length)*1000)/10; // one decimal
+    var lic = licenseById(state.license);
+    var pass = scorePercent >= lic.pass;
+
+    submitStats(pass, scorePercent);
+    renderResultScreen(correctCount, scorePercent, pass, lic);
+  }
+
+  function submitStats(pass, scorePercent){
+    try{
+      document.getElementById("f_pass").value = pass ? "합격" : "불합격";
+      var langLabel = (LANGS.filter(function(l){return l.code===state.lang;})[0]||{}).label_ko || state.lang;
+      document.getElementById("f_lang").value = langLabel;
+      document.getElementById("f_license").value = licenseById(state.license).label_ko;
+      document.getElementById("f_gender").value = state.gender.ko;
+      document.getElementById("f_age").value = state.age.ko;
+      document.getElementById("f_score").value = scorePercent;
+      document.getElementById("statsForm").submit();
+    }catch(e){ /* stats submission is best-effort; never block the user's result */ }
+  }
+
+  function renderResultScreen(correctCount, scorePercent, pass, lic){
+    var wrap = el("div");
+    var card = el("div","card center");
+    card.appendChild(el("h2","title",t().resultTitle));
+
+    var r = 60, c = 2*Math.PI*r;
+    var dash = c * Math.max(0, Math.min(1, scorePercent/100));
+    var ring = el("div","score-ring");
+    ring.innerHTML =
+      "<svg width='150' height='150' viewBox='0 0 150 150'>"+
+        "<circle class='ring-bg' cx='75' cy='75' r='"+r+"'/>"+
+        "<circle class='ring-fill "+(pass?"pass":"fail")+"' cx='75' cy='75' r='"+r+"' "+
+          "stroke-dasharray='"+c.toFixed(1)+"' stroke-dashoffset='"+(c-dash).toFixed(1)+"'/>"+
+      "</svg>"+
+      "<div class='score-ring-label'><div class='result-score'>"+scorePercent+"<small>"+t().scoreUnit+"</small></div></div>";
+    card.appendChild(ring);
+    card.appendChild(el("div","result-pass "+(pass?"pass":"fail"), pass ? t().pass : t().fail));
+
+    var meta = el("div","");
+    meta.appendChild(el("div","meta-row","<span>"+t().correctCountLabel+"</span><span>"+correctCount+" / "+state.questions.length+"</span>"));
+    meta.appendChild(el("div","meta-row","<span>"+t().licenseLabel+"</span><span>"+licenseLabel(lic)+"</span>"));
+    meta.appendChild(el("div","meta-row","<span>"+t().passStandardLabel+"</span><span>"+lic.pass+t().standardSuffix+"</span>"));
+    card.appendChild(meta);
+
+    var retryBtn = el("button","btn block",t().retry);
+    retryBtn.style.marginTop="18px";
+    retryBtn.onclick = function(){ resetToStart(); };
+    card.appendChild(retryBtn);
+    wrap.appendChild(card);
+
+    // review section
+    var reviewCard = el("div","card");
+    reviewCard.appendChild(el("h2","title",t().reviewTitle));
+    state.questions.forEach(function(q,i){
+      var given = state.answers[i];
+      var correct = isCorrect(q, given);
+      var item = el("div","review-item");
+      item.appendChild(el("div","","<b>"+t().questionLabel+" "+(i+1)+"</b> <span class='tag "+(correct?"ok":"no")+"'>"+(correct?t().correctTag:t().wrongTag)+"</span>"));
+      item.appendChild(el("div","qtext", escapeHtml(q.question)));
+      q.options.forEach(function(optText,idx){
+        var optIdx = idx+1;
+        var cls = "review-opt";
+        if(q.answer.indexOf(optIdx)>=0) cls += " correct";
+        else if(given.indexOf(optIdx)>=0) cls += " wrong-pick";
+        var div = el("div",cls, (idx+1)+". "+escapeHtml(optText));
+        item.appendChild(div);
+      });
+      if(q.explanation){
+        item.appendChild(el("div","hint",t().explanationPrefix+escapeHtml(q.explanation)));
+      }
+      reviewCard.appendChild(item);
+    });
+    wrap.appendChild(reviewCard);
+
+    render(wrap);
+  }
+
+  function resetToStart(){
+    state = {lang:null,license:null,gender:null,age:null,questions:[],answers:[],idx:0,
+      timeLeft:EXAM_SECONDS,timerHandle:null,submitted:false};
+    document.getElementById("appTitle").textContent = "운전면허 학과시험 모의고사 / Driver's License Written Exam";
+    var adminLinkEl = document.getElementById("adminLink");
+    if(adminLinkEl) adminLinkEl.textContent = STR.ko.adminLink;
+    goLang();
+  }
+
+  /* ---------------- navigation helpers ---------------- */
+  function goLang(){ screenLang(); }
+  function goLicense(){ screenLicense(); }
+  function goGender(){ screenGender(); }
+  function goAge(){ screenAge(); }
+
+  /* ---------------- Admin mode ---------------- */
+
+  function renderFooter(){
+    var f = el("div","footer-admin","<a id='adminLink'>"+t().adminLink+"</a>");
+    document.getElementById("app").appendChild(f);
+    document.getElementById("adminLink").onclick = adminGate;
+  }
+
+  function adminGate(){
+    var overlay = el("div","card center");
+    overlay.style.position="fixed"; overlay.style.top="0"; overlay.style.left="0";
+    overlay.style.right="0"; overlay.style.bottom="0"; overlay.style.zIndex="999";
+    overlay.style.borderRadius="0"; overlay.style.display="flex";
+    overlay.style.flexDirection="column"; overlay.style.justifyContent="center";
+    overlay.style.maxWidth="none";
+    var box = el("div","",""); box.style.maxWidth="360px"; box.style.margin="0 auto"; box.style.width="100%";
+    box.appendChild(el("h2","title",t().adminAuthTitle));
+    var pin = document.createElement("input");
+    pin.type="password"; pin.className="pin"; pin.placeholder=t().pinPlaceholder; pin.maxLength=8;
+    box.appendChild(pin);
+    var row = el("div","rowbtns");
+    var cancel = el("button","btn secondary",t().cancel);
+    cancel.onclick = function(){ document.body.removeChild(overlay); };
+    var ok = el("button","btn",t().confirm);
+    ok.onclick = function(){
+      if(pin.value===ADMIN_PIN){ document.body.removeChild(overlay); renderAdminScreen(); }
+      else { alert(t().pinWrong); }
+    };
+    row.appendChild(cancel); row.appendChild(ok);
+    box.appendChild(row);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    pin.focus();
+  }
+
+  function renderAdminScreen(){
+    var wrap = el("div");
+    var card = el("div","card");
+    card.appendChild(el("h2","title",t().adminTitle));
+    card.appendChild(el("p","sub",t().adminSub));
+    var open = document.createElement("a");
+    open.href = SHEET_URL; open.target = "_blank"; open.rel="noopener";
+    open.className = "btn block";
+    open.textContent = t().openSheet;
+    open.style.marginBottom = "18px";
+    card.appendChild(open);
+
+    card.appendChild(el("h2","title",t().standardsTitle));
+    var table = document.createElement("table");
+    table.className = "admin-table";
+    table.innerHTML = "<tr><th>"+t().thLicense+"</th><th>"+t().thBank+"</th><th>"+t().thStandard+"</th></tr>" +
+      LICENSES.map(function(l){
+        return "<tr><td>"+licenseLabel(l)+"</td><td>"+(l.bank==="AB"?t().bankAB:t().bankMC)+"</td><td>"+l.pass+t().standardSuffix+"</td></tr>";
+      }).join("");
+    card.appendChild(table);
+
+    card.appendChild(el("p","hint",t().adminNote));
+
+    var back = el("button","btn secondary block",t().close);
+    back.style.marginTop="10px";
+    back.onclick = function(){ resetToStart(); };
+    card.appendChild(back);
+
+    wrap.appendChild(card);
+    render(wrap);
+  }
+
+  /* ---------------- boot ---------------- */
+  renderFooter();
+  goLang();
+
+})();
+</script>
+</body>
+</html>
