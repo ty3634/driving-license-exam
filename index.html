@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="images/brand/character.png">
 <title>운전면허 학과시험 모의고사</title>
 <style>
   :root{
@@ -25,9 +26,18 @@
     -webkit-font-smoothing:antialiased;
   }
   #app{max-width:720px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
-  header.topbar{padding:26px 20px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;}
-  .brand-badge{width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:var(--shadow-sm);}
+  header.topbar{position:relative;padding:26px 76px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .brand-badge{height:44px;padding:6px 14px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:#ffffff;box-shadow:var(--shadow-sm);border:1px solid var(--border);}
+  .brand-badge img{height:100%;width:auto;display:block;}
+  .header-character{position:absolute;top:8px;right:10px;height:58px;width:auto;display:block;
+    filter:drop-shadow(0 4px 10px rgba(70,80,140,.18));}
+  .home-btn{position:absolute;top:16px;left:10px;display:flex;align-items:center;gap:5px;
+    padding:8px 12px 8px 10px;border-radius:20px;background:#ffffff;border:1px solid var(--border);
+    color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-sm);
+    transition:.15s ease;}
+  .home-btn:hover{border-color:var(--primary);color:var(--primary-dark);transform:translateY(-1px);}
+  .home-btn svg{flex-shrink:0;}
   header.topbar h1{font-size:15.5px;margin:0;color:var(--muted);font-weight:600;letter-spacing:.01em;line-height:1.4;}
   main{flex:1;padding:10px 18px 44px;display:flex;flex-direction:column;gap:16px;}
   .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
@@ -136,12 +146,16 @@
 <body>
 <div id="app">
   <header class="topbar">
-    <div class="brand-badge">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="9" stroke="#ffffff" stroke-width="1.8"/>
-        <circle cx="12" cy="12" r="2.1" fill="#ffffff"/>
-        <path d="M12 3v4.3M12 16.7V21M3 12h4.3M16.7 12H21" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+    <button class="home-btn" id="homeBtn" type="button" title="처음 화면으로">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 11.5L12 4l9 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3.5a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
+      <span id="homeBtnLabel">처음 화면으로</span>
+    </button>
+    <img class="header-character" src="images/brand/character.png" alt="교통안전 캐릭터">
+    <div class="brand-badge">
+      <img src="images/brand/koroad_logo.png" alt="한국도로교통공단 KOROAD 전남광주통합특별시지부">
     </div>
     <h1 id="appTitle">운전면허 학과시험 모의고사 / Driver's License Written Exam</h1>
   </header>
@@ -253,6 +267,8 @@
       reviewTitle: "문제별 정답 확인",
       correctTag: "정답", wrongTag: "오답",
       explanationPrefix: "해설: ",
+      homeLink: "처음 화면으로",
+      confirmLeaveExam: "응시 중인 시험을 종료하고 처음 화면으로 돌아가시겠습니까? 지금까지 답변한 내용은 저장되지 않습니다.",
       adminLink: "관리자",
       adminAuthTitle: "관리자 인증",
       pinPlaceholder: "PIN 입력",
@@ -298,6 +314,8 @@
       reviewTitle: "Answer Review",
       correctTag: "Correct", wrongTag: "Incorrect",
       explanationPrefix: "Explanation: ",
+      homeLink: "Home",
+      confirmLeaveExam: "End the exam in progress and go back to the home screen? Your answers so far will not be saved.",
       adminLink: "Admin",
       adminAuthTitle: "Admin sign-in",
       pinPlaceholder: "Enter PIN",
@@ -343,6 +361,8 @@
       reviewTitle: "Xem lại đáp án từng câu",
       correctTag: "Đúng", wrongTag: "Sai",
       explanationPrefix: "Giải thích: ",
+      homeLink: "Về trang chủ",
+      confirmLeaveExam: "Kết thúc bài thi đang làm và quay về màn hình chính? Các câu đã trả lời sẽ không được lưu.",
       adminLink: "Quản trị",
       adminAuthTitle: "Xác thực quản trị viên",
       pinPlaceholder: "Nhập mã PIN",
@@ -388,6 +408,8 @@
       reviewTitle: "逐题查看答案",
       correctTag: "正确", wrongTag: "错误",
       explanationPrefix: "解析：",
+      homeLink: "返回首页",
+      confirmLeaveExam: "要结束正在进行的考试并返回首页吗？目前为止作答的内容将不会被保存。",
       adminLink: "管理员",
       adminAuthTitle: "管理员认证",
       pinPlaceholder: "请输入PIN码",
@@ -488,6 +510,9 @@
         document.getElementById("appTitle").textContent = t().appTitle;
         var adminLinkEl = document.getElementById("adminLink");
         if(adminLinkEl) adminLinkEl.textContent = t().adminLink;
+        var homeLabelEl = document.getElementById("homeBtnLabel");
+        if(homeLabelEl) homeLabelEl.textContent = t().homeLink;
+        document.getElementById("homeBtn").title = t().homeLink;
         goLicense();
       };
       grid.appendChild(b);
@@ -812,12 +837,26 @@
   }
 
   function resetToStart(){
+    if(state.timerHandle) clearInterval(state.timerHandle);
     state = {lang:null,license:null,gender:null,age:null,questions:[],answers:[],idx:0,
       timeLeft:EXAM_SECONDS,timerHandle:null,submitted:false};
     document.getElementById("appTitle").textContent = "운전면허 학과시험 모의고사 / Driver's License Written Exam";
     var adminLinkEl = document.getElementById("adminLink");
     if(adminLinkEl) adminLinkEl.textContent = STR.ko.adminLink;
+    var homeLabelEl = document.getElementById("homeBtnLabel");
+    if(homeLabelEl) homeLabelEl.textContent = STR.ko.homeLink;
     goLang();
+  }
+
+  // "처음 화면으로" -- reachable from any screen, including mid-exam. If an
+  // exam is actively in progress (started, not yet submitted) confirm first
+  // so a stray tap doesn't silently wipe 40 questions' worth of answers.
+  function goHome(){
+    var examInProgress = state.questions.length > 0 && !state.submitted;
+    if(examInProgress){
+      if(!confirm(t().confirmLeaveExam)) return;
+    }
+    resetToStart();
   }
 
   /* ---------------- navigation helpers ---------------- */
@@ -894,6 +933,7 @@
   }
 
   /* ---------------- boot ---------------- */
+  document.getElementById("homeBtn").onclick = goHome;
   renderFooter();
   goLang();
 
